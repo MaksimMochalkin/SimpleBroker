@@ -1,0 +1,9 @@
+bin/
+obj/
+.vs/
+.idea/
+*.user
+TestResults/
+loadtests/data/*.json
+!loadtests/data/.gitkeep
+.env

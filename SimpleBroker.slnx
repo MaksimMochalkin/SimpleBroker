@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SimpleBroker.Accounts.Contracts/SimpleBroker.Accounts.Contracts.csproj" />
+    <Project Path="src/SimpleBroker.Accounts/SimpleBroker.Accounts.csproj" />
+    <Project Path="src/SimpleBroker.Orders.Contracts/SimpleBroker.Orders.Contracts.csproj" />
+    <Project Path="src/SimpleBroker.Orders/SimpleBroker.Orders.csproj" />
+    <Project Path="src/SimpleBroker.Trades.Contracts/SimpleBroker.Trades.Contracts.csproj" />
+    <Project Path="src/SimpleBroker.Trades/SimpleBroker.Trades.csproj" />
+    <Project Path="src/SimpleBroker.Host/SimpleBroker.Host.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SimpleBroker.ArchitectureTests/SimpleBroker.ArchitectureTests.csproj" />
+    <Project Path="tests/SimpleBroker.IntegrationTests/SimpleBroker.IntegrationTests.csproj" />
+  </Folder>
+  <Folder Name="/tools/">
+    <Project Path="tools/DataGen/DataGen.csproj" />
+  </Folder>
+</Solution>
