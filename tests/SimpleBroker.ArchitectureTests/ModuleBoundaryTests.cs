@@ -1,12 +1,14 @@
+namespace SimpleBroker.ArchitectureTests;
+
 using System.Reflection;
+
 using NetArchTest.Rules;
+
 using SimpleBroker.Accounts;
 using SimpleBroker.Orders;
 using SimpleBroker.Trades;
+
 using Xunit;
-
-namespace SimpleBroker.ArchitectureTests;
-
 /// <summary>
 /// Module boundaries as executable rules (ADR-0001):
 /// a module may use another module only through its *.Contracts assembly.

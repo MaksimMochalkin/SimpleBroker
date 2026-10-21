@@ -1,10 +1,12 @@
+namespace SimpleBroker.IntegrationTests;
+
 using System.Net;
 using System.Net.Http.Json;
+
 using SimpleBroker.Trades.Contracts;
 using SimpleBroker.Trades.Internal;
-using Xunit;
 
-namespace SimpleBroker.IntegrationTests;
+using Xunit;
 
 [Collection("broker")]
 public class TradesTests(BrokerFixture fx)
