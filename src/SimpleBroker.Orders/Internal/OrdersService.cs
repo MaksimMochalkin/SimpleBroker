@@ -1,8 +1,9 @@
+namespace SimpleBroker.Orders.Internal;
+
 using Microsoft.EntityFrameworkCore;
+
 using SimpleBroker.Accounts.Contracts;
 using SimpleBroker.Orders.Contracts;
-
-namespace SimpleBroker.Orders.Internal;
 
 public enum CreateOrderOutcome { Created, Invalid, AccountNotFound, InstrumentNotFound }
 

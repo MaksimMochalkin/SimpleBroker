@@ -1,6 +1,6 @@
 # stage-01-skeleton.md — Этап 1. Каркас: модульный монолит, наблюдаемость, baseline
 
-> Обновлено: 2026-10-20 · Ветка: `stage/01-skeleton` · Тег по завершении: `v0.1` · Статус: Код готов, ждёт проверки · Сроки: нед 1–2 (2026-10-20 → 2026-11-02) · Родитель: [plan_highload_broker.md](plan_highload_broker.md)
+> Обновлено: 2026-10-22 · Ветка: `stage/01-skeleton` · Тег по завершении: `v0.1` · Статус: В работе · Сроки: нед 1–2 (2026-10-20 → 2026-11-02) · Родитель: [plan_highload_broker.md](plan_highload_broker.md)
 
 **Как читать:** разделы 0–3 и текущую сессию. Конфиги и скрипты (разделы 5–6) открываем, когда сессия до них дошла. Когда скрипт реализован в репозитории, здесь остаётся ссылка на путь, а не копия кода.
 
@@ -125,10 +125,10 @@ erDiagram
 - [x] **S7** [U] Orders: валидация, проверка существования счёта через `Accounts.Contracts`, сохранение со статусом `New`.
 - [x] **S8** [U] Trades: `GET /accounts/{id}/trades` с OFFSET-пагинацией (без доп. индексов, намеренно).
 - [x] **S9** [A] Спецификация и каркас `tools/DataGen` (раздел 4). [U] Реализовать генерацию через Npgsql `COPY ... BINARY`.
-- [ ] **S10** [U] Прогнать генератор на масштабах S и M, записать время загрузки и размер БД (раздел 7).
+- [x] **S10** [U] Прогнать генератор на масштабах S и M, записать время загрузки и размер БД (раздел 7).
 - [x] **S11** [U] Скрипт `loadtests/baseline.js` (раздел 6), сохранить `loadtests/data/accounts.json`; собрать дашборд Grafana (список панелей в разделе 5.6).
-- [ ] **S12** [U] Три прогона L1 на S и M; параллельно `dotnet-counters`; записать цифры. [A] Помочь с интерпретацией.
-- [ ] **S13** (каркас журнала, ADR и README готовы [A]; цифры после S12) [U] `docs/journal/01-skeleton.md`, ADR-0001 (modular monolith), ADR-0002 (observability stack), README (EN) со скелетом. [A] Ревью английского и структуры.
+- [x] **S12** [U] Три прогона L1 на S и M; параллельно `dotnet-counters`; записать цифры. [A] Помочь с интерпретацией.
+- [x] **S13** (journal, ADR, README, `docs/RUNBOOK.md` заполнены цифрами машины A [A]; p99 и машина B — после повторных прогонов) [U] `docs/journal/01-skeleton.md`, ADR-0001 (modular monolith), ADR-0002 (observability stack), README (EN) со скелетом. [A] Ревью английского и структуры.
 - [ ] **S14** Буфер, чистка, `docker compose down -v && up` на чистом состоянии, тег `v0.1`, обновить статусы в планах.
 
 **Как проверить:**
@@ -189,7 +189,7 @@ services:
       POSTGRES_DB: broker
     command: ["postgres", "-c", "shared_preload_libraries=pg_stat_statements",
               "-c", "pg_stat_statements.track=all", "-c", "max_connections=200"]
-    ports: ["5432:5432"]
+    ports: ["5433:5432"]   # 5433: порт 5432 часто занят локальным Postgres
     cpus: 2          # подобрать под машину и зафиксировать в journal
     mem_limit: 4g
     volumes:
@@ -309,7 +309,7 @@ RPS (`rate(http_server_request_duration_seconds_count[1m])`), p50/p95/p99 (`hist
 ```bash
 docker compose up -d
 dotnet ef database update -p src/SimpleBroker.Accounts -s src/SimpleBroker.Host -c AccountsDbContext   # так же для Orders, Trades
-dotnet run -c Release --project tools/DataGen -- --scale M --seed 42 --connection "Host=localhost;Username=broker;Password=broker;Database=broker" --out loadtests/data
+dotnet run -c Release --project tools/DataGen -- --scale M --seed 42 --connection "Host=localhost;Port=5433;Username=broker;Password=broker;Database=broker" --out loadtests/data
 OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317 dotnet run -c Release --project src/SimpleBroker.Host
 k6 run -e BASE_URL=http://localhost:5000 loadtests/baseline.js
 dotnet-counters monitor --process-id <pid> System.Runtime Microsoft.AspNetCore.Hosting
@@ -384,14 +384,24 @@ export default function () {
 
 | Масштаб | Время по фазам | Размер БД | Заметки |
 |---|---|---|---|
-| S | | | |
-| M | | | |
+| S | truncate 0.0 · instruments 0.1 · accounts 0.1 · balances 0.1 · orders 1.3 · trades 0.2 · analyze 0.3 · итого 2.1 с | 77 MB | seed 42, Postgres на порту 5433 |
+| M | truncate 0.0 · instruments 0.1 · accounts 0.3 · balances 0.3 · orders 7.1 · trades 2.4 · analyze 1.6 · итого 11.8 с | 693 MB | seed 42 |
 
 **Прогоны**
 
 | # | Кейс | Масштаб | Цель RPS | Факт RPS | p50 | p95 | p99 | Ошибки | CPU app / PG | Что насытилось первым |
 |---|---|---|---|---|---|---|---|---|---|---|
-| 1 | L1 | S | | | | | | | | |
+| 1 | L1 | S | 50→300 (ср. 207.7) | 207.3 | 6.15 ms | 18.77 ms | н/д | 0.00% | н/д | не насытилось; max 4.06 s (холодный старт), dropped 151 |
+| 2 | L1 | S | 50→300 (ср. 207.7) | 207.7 | 5.59 ms | 10.40 ms | н/д | 0.00% | н/д | не насытилось; dropped 0 |
+| 3 | L1 | S | 50→300 (ср. 207.7) | 207.7 | 5.07 ms | 10.06 ms | н/д | 0.00% | н/д | не насытилось; dropped 0 |
+| **мед. S** | L1 | S | | 207.7 | 5.59 ms | 10.40 ms | н/д | 0.00% | н/д | цель достигнута |
+| 4 | L1 | M | 50→300 (ср. 207.7) | 40.8 | 9.64 s | 22.69 s | н/д | 0.00% | н/д | dropped 64 812 (80%), 500 VU исчерпаны |
+| 5 | L1 | M | 50→300 (ср. 207.7) | 41.1 | 9.67 s | 22.57 s | н/д | 0.00% | н/д | dropped 64 672 (80%) |
+| 6 | L1 | M | 50→300 (ср. 207.7) | 42.4 | 9.28 s | 21.99 s | н/д | 0.00% | н/д | dropped 64 188 (79%) |
+| **мед. M** | L1 | M | | 41.1 | 9.64 s | 22.57 s | н/д | 0.00% | н/д | **порог p95<1 s провален**; гипотеза: GET trades (OR по двум колонкам, без индекса) + OFFSET на 1M строк упирается в CPU Postgres (2 CPU); не подтверждена: нет CPU/pg_stat_statements под нагрузкой |
+
+**Окружение:** .NET SDK 10.0.402; Docker 15.38 GiB RAM, Postgres 17 в контейнере (cpus 2, mem 4g); k6 и API на той же машине. Модель CPU и диск дописать.
+**Пробелы:** p99 нет (k6 по умолчанию не печатает): `summaryTrendStats` с `p(99)` уже добавлен в `loadtests/*.js`, цифры появятся при повторных прогонах на машине B (результаты машин A и B не смешиваем). CPU app/PG под нагрузкой не снят: шаги F4-F5 в `docs/RUNBOOK.md`.
 
 ---
 

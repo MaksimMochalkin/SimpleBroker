@@ -7,3 +7,4 @@ TestResults/
 loadtests/data/*.json
 !loadtests/data/.gitkeep
 .env
+*.log

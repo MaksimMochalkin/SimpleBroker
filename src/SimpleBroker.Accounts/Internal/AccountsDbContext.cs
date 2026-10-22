@@ -55,7 +55,7 @@ public sealed class AccountsDesignTimeFactory : IDesignTimeDbContextFactory<Acco
     public AccountsDbContext CreateDbContext(string[] args)
     {
         var cs = Environment.GetEnvironmentVariable("ConnectionStrings__Broker")
-                 ?? "Host=localhost;Username=broker;Password=broker;Database=broker";
+                 ?? "Host=localhost;Port=5433;Username=broker;Password=broker;Database=broker";
         var b = new DbContextOptionsBuilder<AccountsDbContext>();
         AccountsDbContext.Configure(b, cs);
         return new AccountsDbContext(b.Options);

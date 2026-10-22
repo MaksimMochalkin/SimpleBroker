@@ -1,7 +1,7 @@
+namespace SimpleBroker.Trades.Internal;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-
-namespace SimpleBroker.Trades.Internal;
 
 public sealed class TradesDbContext(DbContextOptions<TradesDbContext> options) : DbContext(options)
 {
@@ -39,7 +39,7 @@ public sealed class TradesDesignTimeFactory : IDesignTimeDbContextFactory<Trades
     public TradesDbContext CreateDbContext(string[] args)
     {
         var cs = Environment.GetEnvironmentVariable("ConnectionStrings__Broker")
-                 ?? "Host=localhost;Username=broker;Password=broker;Database=broker";
+                 ?? "Host=localhost;Port=5433;Username=broker;Password=broker;Database=broker";
         var b = new DbContextOptionsBuilder<TradesDbContext>();
         TradesDbContext.Configure(b, cs);
         return new TradesDbContext(b.Options);

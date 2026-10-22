@@ -1,7 +1,8 @@
-using Microsoft.EntityFrameworkCore;
-using SimpleBroker.Trades.Contracts;
-
 namespace SimpleBroker.Trades.Internal;
+
+using Microsoft.EntityFrameworkCore;
+
+using SimpleBroker.Trades.Contracts;
 
 public sealed class TradesService(TradesDbContext db)
 {
