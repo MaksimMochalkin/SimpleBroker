@@ -47,7 +47,9 @@ public sealed class BrokerFixture : IAsyncLifetime
     private Task CreateTables<T>(string schema) where T : DbContext =>
         WithDb<T>(async db =>
         {
-            await db.Database.ExecuteSqlAsync($"CREATE SCHEMA IF NOT EXISTS {schema}");
+#pragma warning disable EF1002 // schema is a compile-time constant of our own modules, DDL can't be parameterized
+            await db.Database.ExecuteSqlRawAsync("CREATE SCHEMA IF NOT EXISTS " + schema);
+#pragma warning restore EF1002
             await db.GetService<IRelationalDatabaseCreator>().CreateTablesAsync();
         });
 

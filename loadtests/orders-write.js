@@ -10,6 +10,7 @@ const step = (rate) => [
 ];
 
 export const options = {
+  summaryTrendStats: ['avg', 'min', 'med', 'p(90)', 'p(95)', 'p(99)', 'max'],
   scenarios: {
     writes: {
       executor: 'ramping-arrival-rate',

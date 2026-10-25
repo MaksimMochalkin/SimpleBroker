@@ -175,7 +175,7 @@ internal sealed record Options(string Scale, int Seed, string Connection, string
 {
     public static Options Parse(string[] args)
     {
-        string scale = "S", conn = "Host=localhost;Username=broker;Password=broker;Database=broker;Command Timeout=0", output = "loadtests/data";
+        string scale = "S", conn = "Host=localhost;Port=5433;Username=broker;Password=broker;Database=broker;Command Timeout=0", output = "loadtests/data";
         var seed = 42;
         for (var i = 0; i < args.Length - 1; i++)
         {

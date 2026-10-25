@@ -10,6 +10,7 @@ for (let rate = 100; rate <= 1500; rate += 100) {
 }
 
 export const options = {
+  summaryTrendStats: ['avg', 'min', 'med', 'p(90)', 'p(95)', 'p(99)', 'max'],
   scenarios: {
     step: {
       executor: 'ramping-arrival-rate',

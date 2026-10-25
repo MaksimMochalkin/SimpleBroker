@@ -5,6 +5,7 @@ import { check } from 'k6';
 import { BASE, JSON_HDR, pickAccount, orderBody, randInt, is2xx } from './common.js';
 
 export const options = {
+  summaryTrendStats: ['avg', 'min', 'med', 'p(90)', 'p(95)', 'p(99)', 'max'],
   scenarios: {
     mixed: {
       executor: 'ramping-arrival-rate',

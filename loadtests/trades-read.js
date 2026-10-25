@@ -5,6 +5,7 @@ import { check } from 'k6';
 import { BASE, pickAccount, randInt, is2xx } from './common.js';
 
 export const options = {
+  summaryTrendStats: ['avg', 'min', 'med', 'p(90)', 'p(95)', 'p(99)', 'max'],
   scenarios: {
     trades: {
       executor: 'constant-arrival-rate',

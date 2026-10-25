@@ -1,3 +1,5 @@
+namespace SimpleBroker.Orders;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -5,8 +7,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleBroker.Orders.Contracts;
 using SimpleBroker.Orders.Internal;
-
-namespace SimpleBroker.Orders;
 
 public static class OrdersModule
 {

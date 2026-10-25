@@ -50,7 +50,7 @@ public sealed class OrdersDesignTimeFactory : IDesignTimeDbContextFactory<Orders
     public OrdersDbContext CreateDbContext(string[] args)
     {
         var cs = Environment.GetEnvironmentVariable("ConnectionStrings__Broker")
-                 ?? "Host=localhost;Username=broker;Password=broker;Database=broker";
+                 ?? "Host=localhost;Port=5433;Username=broker;Password=broker;Database=broker";
         var b = new DbContextOptionsBuilder<OrdersDbContext>();
         OrdersDbContext.Configure(b, cs);
         return new OrdersDbContext(b.Options);
