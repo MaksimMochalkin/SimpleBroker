@@ -1,10 +1,12 @@
 namespace SimpleBroker.IntegrationTests;
 
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 using SimpleBroker.Accounts.Internal;
 using SimpleBroker.Orders.Internal;
@@ -13,6 +15,7 @@ using SimpleBroker.Trades.Internal;
 using Testcontainers.PostgreSql;
 
 using Xunit;
+
 /// <summary>One real Postgres per test run; tables are created from the EF model (no migrations needed).</summary>
 public sealed class BrokerFixture : IAsyncLifetime
 {
@@ -20,6 +23,7 @@ public sealed class BrokerFixture : IAsyncLifetime
 
     public WebApplicationFactory<Program> Factory { get; private set; } = null!;
     public HttpClient Client { get; private set; } = null!;
+    public CapturingLoggerProvider Logs { get; } = new();
 
     public async Task InitializeAsync()
     {
@@ -28,8 +32,9 @@ public sealed class BrokerFixture : IAsyncLifetime
         // Env vars are the one override that Program.cs sees before building the host.
         Environment.SetEnvironmentVariable("ConnectionStrings__Broker", _pg.GetConnectionString());
         Environment.SetEnvironmentVariable("OTEL_SDK_DISABLED", "true");
+        Environment.SetEnvironmentVariable("Accounts__AllowModeOverride", "true"); // ?mode= for stage-2 concurrency tests
 
-        Factory = new WebApplicationFactory<Program>();
+        Factory = new WebApplicationFactory<Program>().WithWebHostBuilder(b => b.ConfigureLogging(l => l.AddProvider(Logs)));
         Client = Factory.CreateClient();
 
         await CreateTables<AccountsDbContext>(AccountsDbContext.Schema);

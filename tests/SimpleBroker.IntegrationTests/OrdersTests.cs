@@ -14,11 +14,8 @@ public class OrdersTests(BrokerFixture fx)
 {
     private const int InstrumentId = 7001;
 
-    private async Task<long> NewAccount()
-    {
-        var r = await fx.Client.PostAsJsonAsync("/accounts", new CreateAccountRequest("trader", "USD"));
-        return (await r.Content.ReadFromJsonAsync<AccountCreatedResponse>())!.Id;
-    }
+    // Buy orders reserve funds since stage 2, so accounts get a deposit by default.
+    private Task<long> NewAccount(decimal deposit = 100_000m) => fx.Client.NewAccountAsync(deposit);
 
     private Task SeedInstrument() => fx.WithDb<OrdersDbContext>(async db =>
     {
@@ -78,12 +75,27 @@ public class OrdersTests(BrokerFixture fx)
     }
 
     [Fact]
-    public async Task Market_order_needs_no_price()
+    public async Task Market_sell_needs_no_price()
     {
         await SeedInstrument();
         var account = await NewAccount();
         var r = await fx.Client.PostAsJsonAsync("/orders",
-            new CreateOrderRequest(account, InstrumentId, "Buy", "Market", null, 3m));
+            new CreateOrderRequest(account, InstrumentId, "Sell", "Market", null, 3m));
         Assert.Equal(HttpStatusCode.Created, r.StatusCode);
+    }
+
+    [Fact]
+    public async Task Market_buy_requires_a_price_cap()
+    {
+        await SeedInstrument();
+        var account = await NewAccount();
+
+        var withoutCap = await fx.Client.PostAsJsonAsync("/orders",
+            new CreateOrderRequest(account, InstrumentId, "Buy", "Market", null, 3m));
+        Assert.Equal(HttpStatusCode.BadRequest, withoutCap.StatusCode);
+
+        var withCap = await fx.Client.PostAsJsonAsync("/orders",
+            new CreateOrderRequest(account, InstrumentId, "Buy", "Market", 20m, 3m));
+        Assert.Equal(HttpStatusCode.Created, withCap.StatusCode);
     }
 }

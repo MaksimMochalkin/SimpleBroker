@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleBroker.Orders.Contracts;
 using SimpleBroker.Orders.Internal;
+using SimpleBroker.Platform.Outbox;
 
 public static class OrdersModule
 {
@@ -17,6 +18,7 @@ public static class OrdersModule
 
         services.AddDbContextPool<OrdersDbContext>(o => OrdersDbContext.Configure(o, cs));
         services.AddScoped<OrdersService>();
+        services.AddOutboxPublisher<OrdersDbContext>();
         return services;
     }
 
@@ -29,6 +31,7 @@ public static class OrdersModule
             {
                 CreateOrderOutcome.Created => Results.Created($"/orders/{result.Id}", new OrderCreatedResponse(result.Id!.Value, "New")),
                 CreateOrderOutcome.Invalid => Results.BadRequest(new { error = result.Error }),
+                CreateOrderOutcome.InsufficientFunds => Results.UnprocessableEntity(new { error = result.Error }),
                 _ => Results.NotFound(new { error = result.Error }),
             };
         });

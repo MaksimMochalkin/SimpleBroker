@@ -13,6 +13,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SimpleBroker.Accounts.Contracts\SimpleBroker.Accounts.Contracts.csproj" />
+    <ProjectReference Include="..\SimpleBroker.Platform\SimpleBroker.Platform.csproj" />
 
   </ItemGroup>
 </Project>

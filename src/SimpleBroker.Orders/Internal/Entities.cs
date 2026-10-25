@@ -24,5 +24,6 @@ public sealed class Order
     public decimal Quantity { get; set; }
     public decimal FilledQuantity { get; set; }
     public OrderStatus Status { get; set; }
+    public Guid? ReservationId { get; set; }
     public DateTime CreatedAt { get; set; }
 }

@@ -1,8 +1,9 @@
+namespace SimpleBroker.Orders.Internal;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace SimpleBroker.Orders.Internal;
+using SimpleBroker.Platform.Outbox;
 
 public sealed class OrdersDbContext(DbContextOptions<OrdersDbContext> options) : DbContext(options)
 {
@@ -10,6 +11,7 @@ public sealed class OrdersDbContext(DbContextOptions<OrdersDbContext> options) :
 
     public DbSet<Instrument> Instruments => Set<Instrument>();
     public DbSet<Order> Orders => Set<Order>();
+    public DbSet<OutboxMessage> Outbox => Set<OutboxMessage>();
 
     public static void Configure(DbContextOptionsBuilder o, string connectionString) =>
         o.UseNpgsql(connectionString, n => n.MigrationsHistoryTable("__EFMigrationsHistory", Schema));
@@ -41,7 +43,10 @@ public sealed class OrdersDbContext(DbContextOptions<OrdersDbContext> options) :
             e.Property(x => x.FilledQuantity).HasColumnName("filled_quantity").HasColumnType("numeric(28,8)");
             e.Property(x => x.Status).HasColumnName("status").HasColumnType("text").HasConversion<string>();
             e.Property(x => x.CreatedAt).HasColumnName("created_at").HasColumnType("timestamptz");
+            e.Property(x => x.ReservationId).HasColumnName("reservation_id").HasColumnType("uuid");
         });
+
+        mb.AddOutbox();
     }
 }
 

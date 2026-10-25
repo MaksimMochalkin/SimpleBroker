@@ -14,5 +14,6 @@
   <ItemGroup>
     <ProjectReference Include="..\SimpleBroker.Orders.Contracts\SimpleBroker.Orders.Contracts.csproj" />
     <ProjectReference Include="..\SimpleBroker.Accounts.Contracts\SimpleBroker.Accounts.Contracts.csproj" />
+    <ProjectReference Include="..\SimpleBroker.Platform\SimpleBroker.Platform.csproj" />
   </ItemGroup>
 </Project>

@@ -57,6 +57,15 @@ public class ModuleBoundaryTests
         Assert.True(result.IsSuccessful, string.Join(", ", result.FailingTypeNames ?? []));
     }
 
+    [Fact]
+    public void Platform_does_not_reference_modules()
+    {
+        var referenced = typeof(SimpleBroker.Platform.Outbox.OutboxMessage).Assembly
+            .GetReferencedAssemblies().Select(a => a.Name!).ToList();
+
+        Assert.DoesNotContain(referenced, n => Modules.Any(m => n == $"SimpleBroker.{m}" || n == $"SimpleBroker.{m}.Contracts"));
+    }
+
     [Theory]
     [InlineData("Accounts")]
     [InlineData("Orders")]

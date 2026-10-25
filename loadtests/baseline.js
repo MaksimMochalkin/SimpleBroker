@@ -2,7 +2,7 @@
 // k6 run -e BASE_URL=http://localhost:5000 loadtests/baseline.js
 import http from 'k6/http';
 import { check } from 'k6';
-import { BASE, JSON_HDR, pickAccount, orderBody, randInt, is2xx } from './common.js';
+import { BASE, JSON_HDR, pickAccount, orderBody, randInt, is2xx, insufficientFunds } from './common.js';
 
 export const options = {
   summaryTrendStats: ['avg', 'min', 'med', 'p(90)', 'p(95)', 'p(99)', 'max'],
@@ -27,6 +27,7 @@ export default function () {
   let res;
   if (r < 0.2) {
     res = http.post(`${BASE}/orders`, orderBody(id), JSON_HDR);
+    if (res.status === 422) insufficientFunds.add(1);
   } else if (r < 0.7) {
     res = http.get(`${BASE}/accounts/${id}/trades?page=${1 + randInt(20)}&size=50`);
   } else {

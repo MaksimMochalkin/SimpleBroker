@@ -3,6 +3,8 @@ namespace SimpleBroker.Accounts.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
+using SimpleBroker.Platform.Outbox;
+
 public sealed class AccountsDbContext(DbContextOptions<AccountsDbContext> options) : DbContext(options)
 {
     public const string Schema = "accounts";
@@ -10,6 +12,8 @@ public sealed class AccountsDbContext(DbContextOptions<AccountsDbContext> option
     public DbSet<Account> Accounts => Set<Account>();
     public DbSet<Balance> Balances => Set<Balance>();
     public DbSet<Position> Positions => Set<Position>();
+    public DbSet<Reservation> Reservations => Set<Reservation>();
+    public DbSet<OutboxMessage> Outbox => Set<OutboxMessage>();
 
     public static void Configure(DbContextOptionsBuilder o, string connectionString) =>
         o.UseNpgsql(connectionString, n => n.MigrationsHistoryTable("__EFMigrationsHistory", Schema));
@@ -30,12 +34,14 @@ public sealed class AccountsDbContext(DbContextOptions<AccountsDbContext> option
 
         mb.Entity<Balance>(e =>
         {
-            e.ToTable("balances");
+            e.ToTable("balances", t => t.HasCheckConstraint("ck_balances_nonneg", "available >= 0 AND reserved >= 0"));
             e.HasKey(x => x.AccountId);
             e.Property(x => x.AccountId).HasColumnName("account_id").ValueGeneratedNever();
             e.Property(x => x.Available).HasColumnName("available").HasColumnType("numeric(28,8)");
             e.Property(x => x.Reserved).HasColumnName("reserved").HasColumnType("numeric(28,8)");
-            e.Property(x => x.Version).HasColumnName("version");
+            // Optimistic concurrency token: tracked updates become UPDATE ... WHERE version = @old.
+            // ExecuteUpdate ignores it (Naive / Atomic / Deposit are not affected).
+            e.Property(x => x.Version).HasColumnName("version").IsConcurrencyToken();
         });
 
         mb.Entity<Position>(e =>
@@ -47,6 +53,19 @@ public sealed class AccountsDbContext(DbContextOptions<AccountsDbContext> option
             e.Property(x => x.Quantity).HasColumnName("quantity").HasColumnType("numeric(28,8)");
             e.Property(x => x.AvgPrice).HasColumnName("avg_price").HasColumnType("numeric(28,8)");
         });
+
+        mb.Entity<Reservation>(e =>
+        {
+            e.ToTable("reservations");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Id).HasColumnName("id").HasColumnType("uuid").ValueGeneratedNever();
+            e.Property(x => x.AccountId).HasColumnName("account_id");
+            e.Property(x => x.Amount).HasColumnName("amount").HasColumnType("numeric(28,8)");
+            e.Property(x => x.Status).HasColumnName("status").HasColumnType("text").HasConversion<string>();
+            e.Property(x => x.CreatedAt).HasColumnName("created_at").HasColumnType("timestamptz");
+        });
+
+        mb.AddOutbox();
     }
 }
 
@@ -55,7 +74,7 @@ public sealed class AccountsDesignTimeFactory : IDesignTimeDbContextFactory<Acco
     public AccountsDbContext CreateDbContext(string[] args)
     {
         var cs = Environment.GetEnvironmentVariable("ConnectionStrings__Broker")
-                 ?? "Host=localhost;Username=broker;Password=broker;Database=broker";
+                 ?? "Host=localhost;Port=5433;Username=broker;Password=broker;Database=broker";
         var b = new DbContextOptionsBuilder<AccountsDbContext>();
         AccountsDbContext.Configure(b, cs);
         return new AccountsDbContext(b.Options);

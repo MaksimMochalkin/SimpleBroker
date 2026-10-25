@@ -38,7 +38,7 @@ var total = Stopwatch.StartNew();
 await Phase("truncate", async () =>
 {
     await using var cmd = new NpgsqlCommand(
-        "TRUNCATE accounts.accounts, accounts.balances, accounts.positions, orders.instruments, orders.orders, trades.trades RESTART IDENTITY", conn);
+        "TRUNCATE accounts.accounts, accounts.balances, accounts.positions, accounts.reservations, accounts.outbox, orders.instruments, orders.orders, orders.outbox, trades.trades RESTART IDENTITY", conn);
     await cmd.ExecuteNonQueryAsync();
 });
 
