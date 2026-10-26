@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleBroker.Trades.Internal;
+
 public static class TradesModule
 {
-    private const int _maxPage = 100_000;
     private const int _maxSize = 200;
 
     public static IServiceCollection AddTradesModule(this IServiceCollection services, IConfiguration configuration)
@@ -23,12 +23,26 @@ public static class TradesModule
 
     public static IEndpointRouteBuilder MapTradesEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/accounts/{id:long}/trades", async (long id, TradesService svc, CancellationToken ct, int page = 1, int size = 50) =>
+        app.MapGet("/accounts/{id:long}/trades", async (
+            long id,
+            TradesService svc,
+            CancellationToken ct,
+            int size = 50,
+            string? cursor = null,
+            int? page = null) =>
         {
-            if (page < 1 || page > _maxPage || size < 1 || size > _maxSize)
-                return Results.BadRequest(new { error = $"page must be 1..{_maxPage}, size 1..{_maxSize}" });
+            if (size < 1 || size > _maxSize || page is < 1 || page > 1)
+                return Results.BadRequest(new { error = $"size must be 1..{_maxSize}; page is deprecated, use cursor for subsequent results" });
 
-            return Results.Ok(await svc.GetForAccountAsync(id, page, size, ct));
+            TradeCursorValue? decodedCursor = null;
+            if (cursor is not null)
+            {
+                if (!TradeCursorCodec.TryDecode(cursor, out var value))
+                    return Results.BadRequest(new { error = "cursor is invalid" });
+                decodedCursor = value;
+            }
+
+            return Results.Ok(await svc.GetForAccountAsync(id, size, decodedCursor, ct));
         });
 
         return app;

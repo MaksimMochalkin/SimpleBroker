@@ -16,11 +16,16 @@ public sealed class TradesDbContext(DbContextOptions<TradesDbContext> options) :
     {
         mb.HasDefaultSchema(Schema);
 
-        // Only the primary key on purpose: indexes are the subject of stage 3.
         mb.Entity<Trade>(e =>
         {
             e.ToTable("trades");
             e.HasKey(x => x.Id);
+            e.HasIndex(x => new { x.BuyAccountId, x.ExecutedAt, x.Id })
+                .IsDescending(false, true, true)
+                .HasDatabaseName("ix_trades_buy_account_executed_at_id");
+            e.HasIndex(x => new { x.SellAccountId, x.ExecutedAt, x.Id })
+                .IsDescending(false, true, true)
+                .HasDatabaseName("ix_trades_sell_account_executed_at_id");
             e.Property(x => x.Id).HasColumnName("id").ValueGeneratedNever();
             e.Property(x => x.InstrumentId).HasColumnName("instrument_id");
             e.Property(x => x.BuyOrderId).HasColumnName("buy_order_id");

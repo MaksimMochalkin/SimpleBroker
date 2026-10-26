@@ -11,4 +11,4 @@ public sealed record TradeDto(
     decimal Quantity,
     DateTime ExecutedAt);
 
-public sealed record TradesPage(int Page, int Size, IReadOnlyList<TradeDto> Items);
+public sealed record TradesPage(int Size, IReadOnlyList<TradeDto> Items, string? NextCursor);

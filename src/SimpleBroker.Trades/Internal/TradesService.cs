@@ -5,21 +5,42 @@ using SimpleBroker.Trades.Contracts;
 
 public sealed class TradesService(TradesDbContext db)
 {
-    /// <summary>
-    /// Intentionally naive for the baseline: OR over two columns, OFFSET pagination, no secondary indexes.
-    /// Fixed in stage 3 (indexes, keyset pagination).
-    /// </summary>
-    public async Task<TradesPage> GetForAccountAsync(long accountId, int page, int size, CancellationToken ct)
+    internal async Task<TradesPage> GetForAccountAsync(
+        long accountId,
+        int size,
+        TradeCursorValue? cursor,
+        CancellationToken ct)
     {
-        var items = await db.Trades.AsNoTracking()
-            .Where(t => t.BuyAccountId == accountId || t.SellAccountId == accountId)
-            .OrderByDescending(t => t.ExecutedAt).ThenByDescending(t => t.Id)
-            .Skip((page - 1) * size)
-            .Take(size)
+        var buys = db.Trades.AsNoTracking()
+            .Where(t => t.BuyAccountId == accountId);
+        var sells = db.Trades.AsNoTracking()
+            .Where(t => t.SellAccountId == accountId && t.BuyAccountId != accountId);
+
+        if (cursor is { } before)
+        {
+            buys = buys.Where(t => t.ExecutedAt < before.ExecutedAt ||
+                                   (t.ExecutedAt == before.ExecutedAt && t.Id < before.Id));
+            sells = sells.Where(t => t.ExecutedAt < before.ExecutedAt ||
+                                     (t.ExecutedAt == before.ExecutedAt && t.Id < before.Id));
+        }
+
+        var rows = await buys.Concat(sells)
+            .OrderByDescending(t => t.ExecutedAt)
+            .ThenByDescending(t => t.Id)
+            .Take(size + 1)
             .Select(t => new TradeDto(t.Id, t.InstrumentId, t.BuyOrderId, t.SellOrderId,
                 t.BuyAccountId, t.SellAccountId, t.Price, t.Quantity, t.ExecutedAt))
             .ToListAsync(ct);
 
-        return new TradesPage(page, size, items);
+        var hasMore = rows.Count > size;
+        if (hasMore)
+            rows.RemoveAt(size);
+
+        var nextCursor = hasMore && rows.Count > 0
+            ? TradeCursorCodec.Encode(rows[^1].ExecutedAt, rows[^1].Id)
+            : null;
+
+        return new TradesPage(size, rows, nextCursor);
     }
+
 }
