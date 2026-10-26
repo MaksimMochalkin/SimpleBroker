@@ -66,12 +66,16 @@ namespace SimpleBroker.Accounts.Migrations
                         .HasColumnName("reserved");
 
                     b.Property<long>("Version")
+                        .IsConcurrencyToken()
                         .HasColumnType("bigint")
                         .HasColumnName("version");
 
                     b.HasKey("AccountId");
 
-                    b.ToTable("balances", "accounts");
+                    b.ToTable("balances", "accounts", t =>
+                        {
+                            t.HasCheckConstraint("ck_balances_nonneg", "available >= 0 AND reserved >= 0");
+                        });
                 });
 
             modelBuilder.Entity("SimpleBroker.Accounts.Internal.Position", b =>
@@ -95,6 +99,70 @@ namespace SimpleBroker.Accounts.Migrations
                     b.HasKey("AccountId", "InstrumentId");
 
                     b.ToTable("positions", "accounts");
+                });
+
+            modelBuilder.Entity("SimpleBroker.Accounts.Internal.Reservation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<long>("AccountId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("account_id");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("numeric(28,8)")
+                        .HasColumnName("amount");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("status");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("reservations", "accounts");
+                });
+
+            modelBuilder.Entity("SimpleBroker.Platform.Outbox.OutboxMessage", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Payload")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("payload");
+
+                    b.Property<DateTime?>("PublishedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("published_at");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("type");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .HasDatabaseName("ix_outbox_pending")
+                        .HasFilter("published_at IS NULL");
+
+                    b.ToTable("outbox", "accounts");
                 });
 #pragma warning restore 612, 618
         }

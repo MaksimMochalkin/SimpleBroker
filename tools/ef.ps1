@@ -12,7 +12,9 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 
-foreach ($m in $Modules) {
+$moduleNames = @($Modules | ForEach-Object { $_ -split ',' } | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+
+foreach ($m in $moduleNames) {
     $project = "src/SimpleBroker.$m"
     $context = "${m}DbContext"
     if ($Command -eq 'add') {

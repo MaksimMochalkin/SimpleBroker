@@ -76,6 +76,10 @@ namespace SimpleBroker.Orders.Migrations
                         .HasColumnType("numeric(28,8)")
                         .HasColumnName("quantity");
 
+                    b.Property<Guid?>("ReservationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("reservation_id");
+
                     b.Property<string>("Side")
                         .IsRequired()
                         .HasColumnType("text")
@@ -94,6 +98,42 @@ namespace SimpleBroker.Orders.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("orders", "orders");
+                });
+
+            modelBuilder.Entity("SimpleBroker.Platform.Outbox.OutboxMessage", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Payload")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("payload");
+
+                    b.Property<DateTime?>("PublishedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("published_at");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("type");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .HasDatabaseName("ix_outbox_pending")
+                        .HasFilter("published_at IS NULL");
+
+                    b.ToTable("outbox", "orders");
                 });
 #pragma warning restore 612, 618
         }

@@ -90,7 +90,7 @@ docker compose exec postgres psql -U broker -d broker -c "SHOW deadlock_timeout"
 **C2. Что проверяем:** EF видит изменения модели (резервы, outbox, колонка заявки, CHECK) и создаёт миграцию. `Trades` не затронут.
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\tools\ef.ps1 add -Name Stage02 -Modules Accounts,Orders
+powershell -ExecutionPolicy Bypass -File .\tools\ef.ps1 add -MigrationName Stage02 -Modules Accounts,Orders
 Select-String -Path src\SimpleBroker.Accounts\Migrations\*Stage02.cs, src\SimpleBroker.Orders\Migrations\*Stage02.cs -Pattern "CreateTable|AddColumn|AddCheckConstraint|DropTable|DropColumn|AlterColumn|name: """
 ```
 
