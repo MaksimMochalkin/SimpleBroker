@@ -3,7 +3,7 @@
 A deliberately simple stock-broker backend, built as a learning project for high-load .NET:
 every technology is introduced only after a measurement shows the problem it solves.
 
-**Status:** stage 1 (skeleton and baseline). See [`plans/`](plans/plan_highload_broker.md) for the roadmap.
+**Status:** stage 2 in progress; results are recorded, but integration tests and load-test exit criteria are not yet met. See [`plans/`](plans/stage-02-accounts-transactions.md) for the current status and [`plans/`](plans/plan_highload_broker.md) for the roadmap.
 
 ## Architecture
 
@@ -58,3 +58,4 @@ Tests: `dotnet test` (integration tests need Docker; they start their own Postgr
 | Stage | Problem found by measurement | Change | Result |
 |---|---|---|---|
 | 1 | - (baseline) | skeleton + observability | see [journal](docs/journal/01-skeleton.md) |
+| 2 | Lost updates, overselling, deadlocks, and hot-account contention | atomic/locked/optimistic withdrawals, ordered transfers, reservations, transactional outbox | 10 architecture tests pass; integration fixture cannot start its Testcontainers Resource Reaper; `Ordered` avoids deadlocks, while C1 repetition, `UnorderedRetry`, and failing L1′ thresholds remain open — see [journal](docs/journal/02-accounts-transactions.md) |

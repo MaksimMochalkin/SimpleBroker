@@ -242,7 +242,7 @@ $tool = "tools/Contention/bin/Release/net10.0/Contention.dll"
 
 ```powershell
 foreach ($m in 'naive','atomic','forupdate','optimistic','repeatableread','serializable') {
-  1..3 | % { dotnet $tool --case c1 --mode $m --deposit 10000 --ops 5000 --parallel 50 2>&1 | Tee-Object "docs/journal/data/02-c1-$m-run$_.txt" }
+  1..3 | % { dotnet $tool --case c1 --mode $m --deposit 10000 --ops 5000 --parallel 50 2>&1 | Tee-Object "docs/journal/data/stage-02/02-c1-$m-run$_.txt" }
 }
 ```
 
@@ -263,7 +263,7 @@ foreach ($m in 'naive','atomic','forupdate','optimistic','repeatableread','seria
 
 ```powershell
 foreach ($m in 'naive','atomic','forupdate','optimistic','repeatableread','serializable') {
-  dotnet $tool --case c1 --mode $m --deposit 1000 --ops 5000 --parallel 50 2>&1 | Tee-Object "docs/journal/data/02-c1-oversell-$m.txt"
+  dotnet $tool --case c1 --mode $m --deposit 1000 --ops 5000 --parallel 50 2>&1 | Tee-Object "docs/journal/data/stage-02/02-c1-oversell-$m.txt"
 }
 ```
 
@@ -282,7 +282,7 @@ curl.exe -s http://localhost:8889/metrics | Select-String "simple_broker_db_retr
 ```powershell
 foreach ($m in 'unordered','unorderedretry','ordered') {
   1..3 | % {
-    $f = "docs/journal/data/02-c2-$m-run$_.txt"
+    $f = "docs/journal/data/stage-02/02-c2-$m-run$_.txt"
     docker compose exec -T postgres psql -U broker -d broker -c "SELECT pg_stat_reset();" | Out-Null
     Start-Sleep 2
     dotnet $tool --case c2 --mode $m --accounts 2 --ops 2000 --parallel 50 --deposit 100000 2>&1 | Tee-Object $f
@@ -315,7 +315,7 @@ docker compose logs postgres | Select-String "deadlock detected" | Select-Object
 ```powershell
 $ids = Get-Content loadtests/data/accounts.json | ConvertFrom-Json
 foreach ($m in 'atomic','forupdate','optimistic','serializable') {
-  k6 run -e BASE_URL=http://localhost:5000 -e MODE=$m -e ACCOUNT=$($ids[0]) loadtests/hot-account.js 2>&1 | Tee-Object "docs/journal/data/02-c3-$m.txt"
+  k6 run -e BASE_URL=http://localhost:5000 -e MODE=$m -e ACCOUNT=$($ids[0]) loadtests/hot-account.js 2>&1 | Tee-Object "docs/journal/data/stage-02/02-c3-$m.txt"
   Start-Sleep 60
 }
 ```
@@ -351,7 +351,7 @@ docker compose exec postgres psql -U broker -d broker -c "ANALYZE;"
 
 ```powershell
 1..3 | % {
-  k6 run -e BASE_URL=http://localhost:5000 loadtests/baseline.js 2>&1 | Tee-Object "docs/journal/data/02-l1-S-run$_.txt"
+  k6 run -e BASE_URL=http://localhost:5000 loadtests/baseline.js 2>&1 | Tee-Object "docs/journal/data/stage-02/02-l1-S-run$_.txt"
   docker compose exec -T postgres psql -U broker -d broker -c "UPDATE accounts.balances SET available = available + reserved, reserved = 0 WHERE reserved > 0; TRUNCATE accounts.reservations;"
   Start-Sleep 60
 }
