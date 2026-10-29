@@ -1,0 +1,38 @@
+﻿                                                                                QUERY PLAN                                                                                 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=2138.42..2144.37 rows=51 width=63) (actual time=2.712..3.815 rows=51 loops=1)
+   Buffers: shared hit=969
+   ->  Gather Merge  (cost=2138.42..2194.42 rows=480 width=63) (actual time=2.711..3.810 rows=51 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=969
+         ->  Sort  (cost=1138.39..1138.99 rows=240 width=63) (actual time=0.413..0.415 rows=17 loops=3)
+               Sort Key: trades.executed_at DESC, trades.id DESC
+               Sort Method: top-N heapsort  Memory: 36kB
+               Buffers: shared hit=969
+               Worker 0:  Sort Method: quicksort  Memory: 25kB
+               Worker 1:  Sort Method: quicksort  Memory: 25kB
+               ->  Parallel Append  (cost=10.80..1130.39 rows=240 width=63) (actual time=0.038..0.362 rows=308 loops=3)
+                     Buffers: shared hit=939
+                     ->  Bitmap Heap Scan on trades  (cost=10.80..1129.19 rows=289 width=63) (actual time=0.120..0.423 rows=465 loops=1)
+                           Recheck Cond: (sell_account_id = 3020)
+                           Filter: (buy_account_id <> 3020)
+                           Heap Blocks: exact=464
+                           Buffers: shared hit=471
+                           ->  Bitmap Index Scan on ix_trades_sell_account_executed_at_id  (cost=0.00..10.73 rows=289 width=0) (actual time=0.083..0.083 rows=465 loops=1)
+                                 Index Cond: (sell_account_id = 3020)
+                                 Buffers: shared hit=7
+                     ->  Bitmap Heap Scan on trades trades_1  (cost=10.80..1128.46 rows=289 width=63) (actual time=0.114..0.616 rows=460 loops=1)
+                           Recheck Cond: (buy_account_id = 3020)
+                           Heap Blocks: exact=458
+                           Buffers: shared hit=468
+                           ->  Bitmap Index Scan on ix_trades_buy_account_executed_at_id  (cost=0.00..10.73 rows=289 width=0) (actual time=0.074..0.074 rows=460 loops=1)
+                                 Index Cond: (buy_account_id = 3020)
+                                 Buffers: shared hit=10
+ Planning:
+   Buffers: shared hit=146
+ Planning Time: 0.311 ms
+ Execution Time: 3.879 ms
+(33 rows)
+
+
