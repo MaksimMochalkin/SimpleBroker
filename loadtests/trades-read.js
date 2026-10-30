@@ -4,6 +4,7 @@ import http from 'k6/http';
 import { check } from 'k6';
 import { BASE, pickAccount, is2xx } from './common.js';
 const rate = parseInt(__ENV.RATE || '200', 10);
+const maxVUs = parseInt(__ENV.MAX_VUS || '400', 10);
 const engine = __ENV.ENGINE || 'ef';
 if (engine !== 'ef' && engine !== 'dapper') {
   throw new Error(`Unsupported ENGINE '${engine}'; expected 'ef' or 'dapper'.`);
@@ -15,7 +16,7 @@ export const options = {
   scenarios: {
     trades: {
       executor: 'constant-arrival-rate',
-      rate, timeUnit: '1s', duration: '3m', preAllocatedVUs: 100, maxVUs: 400,
+      rate, timeUnit: '1s', duration: '3m', preAllocatedVUs: 100, maxVUs,
     },
   },
   thresholds: { http_req_failed: ['rate<0.01'] },
