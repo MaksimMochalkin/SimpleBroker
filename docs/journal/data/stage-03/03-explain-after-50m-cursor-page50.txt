@@ -1,0 +1,47 @@
+﻿                                                                                                                                      QUERY PLAN                                                                                                                                      
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=3478.35..3484.30 rows=51 width=63) (actual time=4.898..6.794 rows=51 loops=1)
+   Buffers: shared hit=1883
+   ->  Gather Merge  (cost=3478.35..3597.36 rows=1020 width=63) (actual time=4.896..6.789 rows=51 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=1883
+         ->  Sort  (cost=2478.33..2479.61 rows=510 width=63) (actual time=1.316..1.319 rows=17 loops=3)
+               Sort Key: trades.executed_at DESC, trades.id DESC
+               Sort Method: top-N heapsort  Memory: 36kB
+               Buffers: shared hit=1883
+               Worker 0:  Sort Method: quicksort  Memory: 25kB
+               Worker 1:  Sort Method: quicksort  Memory: 25kB
+               ->  Parallel Append  (cost=27.51..2461.32 rows=510 width=63) (actual time=0.087..1.224 rows=608 loops=3)
+                     Buffers: shared hit=1853
+                     ->  Bitmap Heap Scan on trades  (cost=27.64..2458.77 rows=619 width=63) (actual time=0.204..1.631 rows=914 loops=1)
+                           Recheck Cond: (((sell_account_id = 17856) AND (executed_at < '2026-04-01 05:35:43.800505+00'::timestamp with time zone)) OR ((sell_account_id = 17856) AND (executed_at = '2026-04-01 05:35:43.800505+00'::timestamp with time zone) AND (id < 34304666)))
+                           Filter: (buy_account_id <> 17856)
+                           Heap Blocks: exact=914
+                           Buffers: shared hit=927
+                           ->  BitmapOr  (cost=27.64..27.64 rows=619 width=0) (actual time=0.120..0.120 rows=0 loops=1)
+                                 Buffers: shared hit=13
+                                 ->  Bitmap Index Scan on ix_trades_sell_account_executed_at_id  (cost=0.00..22.76 rows=619 width=0) (actual time=0.115..0.115 rows=914 loops=1)
+                                       Index Cond: ((sell_account_id = 17856) AND (executed_at < '2026-04-01 05:35:43.800505+00'::timestamp with time zone))
+                                       Buffers: shared hit=9
+                                 ->  Bitmap Index Scan on ix_trades_sell_account_executed_at_id  (cost=0.00..4.58 rows=1 width=0) (actual time=0.004..0.004 rows=0 loops=1)
+                                       Index Cond: ((sell_account_id = 17856) AND (executed_at = '2026-04-01 05:35:43.800505+00'::timestamp with time zone) AND (id < 34304666))
+                                       Buffers: shared hit=4
+                     ->  Bitmap Heap Scan on trades trades_1  (cost=27.51..2406.66 rows=606 width=63) (actual time=0.261..1.890 rows=911 loops=1)
+                           Recheck Cond: (((buy_account_id = 17856) AND (executed_at < '2026-04-01 05:35:43.800505+00'::timestamp with time zone)) OR ((buy_account_id = 17856) AND (executed_at = '2026-04-01 05:35:43.800505+00'::timestamp with time zone) AND (id < 34304666)))
+                           Heap Blocks: exact=911
+                           Buffers: shared hit=926
+                           ->  BitmapOr  (cost=27.51..27.51 rows=606 width=0) (actual time=0.177..0.178 rows=0 loops=1)
+                                 Buffers: shared hit=15
+                                 ->  Bitmap Index Scan on ix_trades_buy_account_executed_at_id  (cost=0.00..22.63 rows=606 width=0) (actual time=0.174..0.174 rows=911 loops=1)
+                                       Index Cond: ((buy_account_id = 17856) AND (executed_at < '2026-04-01 05:35:43.800505+00'::timestamp with time zone))
+                                       Buffers: shared hit=11
+                                 ->  Bitmap Index Scan on ix_trades_buy_account_executed_at_id  (cost=0.00..4.58 rows=1 width=0) (actual time=0.003..0.003 rows=0 loops=1)
+                                       Index Cond: ((buy_account_id = 17856) AND (executed_at = '2026-04-01 05:35:43.800505+00'::timestamp with time zone) AND (id < 34304666))
+                                       Buffers: shared hit=4
+ Planning:
+   Buffers: shared hit=168
+ Planning Time: 0.449 ms
+ Execution Time: 6.888 ms
+(43 rows)
+

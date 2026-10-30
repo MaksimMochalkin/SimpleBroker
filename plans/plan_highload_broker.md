@@ -30,8 +30,8 @@
 | № | Этап (файл) · сроки (нед · даты ММ-ДД) | Зависит от | Статус | Итог (1 строка, когда готов) |
 |---|---|---|---|---|
 | 1 | [Skeleton: modular monolith, observability, baseline](stage-01-skeleton.md) · нед 1–2 · 10-20→11-02 | — | Проверен | Чистый запуск и 27 тестов проверены; machine B M baseline: 24.44 rps, p95 36.77 s; v0.1 tag после слияния в main |
-| 2 | [Accounts and transactions: isolation, deadlocks, outbox](stage-02-accounts-transactions.md) · нед 3–4 · 11-03→11-16 | 1 | В работе | Код и 52 теста проверены; C1 пройден; Ordered и ограниченный UnorderedRetry работают, но высококонкурентные retries требуют решения; C3/L1′ выполняются |
-| 3 | [Trade history: EXPLAIN, indexes, connection pool](stage-03-trades-explain.md) · нед 5–6 · 11-17→11-30 | 1 | Не начат | |
+| 2 | [Accounts and transactions: isolation, deadlocks, outbox](stage-02-accounts-transactions.md) · нед 3–4 · 11-03→11-16 | 1 | Проверен | Реализация и доступные проверки рассмотрены; ограничения интеграционных и нагрузочных проверок зафиксированы в отчёте этапа 2 |
+| 3 | [Trade history: EXPLAIN, indexes, connection pool](stage-03-trades-explain.md) · нед 5–6 · 11-17→11-30 | 1 | Проверен | На 100M подтверждена работа при 200 RPS и около 296 RPS; при 600 RPS получено около 582 RPS с высокой задержкой, отклонение от исходной цели описано в отчёте |
 | 4 | [Partitions, materialized views, replica](stage-04-partitions-replica.md) · нед 7–8 · 12-01→12-14 | 3 | Не начат | |
 | 5 | [Matching engine: global lock to actor per instrument](stage-05-matching.md) · нед 9–11 · 12-15→01-04 | 2 | Не начат | |
 | 6 | [Market data: ingestion, candles, WebSocket](stage-06-market-data.md) · нед 12–14 · 01-05→01-25 | 4 | Не начат | |
@@ -50,7 +50,7 @@
 
 **Статусы (только эти):** `Не начат` · `В работе` · `Код готов, ждёт проверки` · `Проверен` · `Заблокирован` (причина — в разделе 2).
 
-**Сейчас:** этап 1 проверен; этап 2 находится в работе. Release-сборка, 10 архитектурных и 42 интеграционных теста зелёные, C1 и функциональные проверки пройдены. При высокой конкуренции `UnorderedRetry` всё ещё может вернуть 409; C3/L1′ и оставшиеся критерии нужно закрыть до тега `v0.2`. Учебный разбор результатов: [отчёт этапа 2](../docs/journal/stage-02-learning-report-ru.md).
+**Сейчас:** этапы 1–3 отмечены как проверенные; ограничения и неполностью достигнутые целевые показатели этапов 2 и 3 описаны в их отчётах. **Следующий шаг:** начать этап 4 — Partitions, materialized views, replica.
 
 ---
 

@@ -1,0 +1,41 @@
+﻿                                                                                                                                  QUERY PLAN                                                                                                                                  
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=16203.06..16203.18 rows=51 width=63) (actual time=16.004..16.013 rows=51 loops=1)
+   Buffers: shared hit=5941
+   ->  Sort  (cost=16203.06..16213.26 rows=4081 width=63) (actual time=16.002..16.008 rows=51 loops=1)
+         Sort Key: trades.executed_at DESC, trades.id DESC
+         Sort Method: top-N heapsort  Memory: 36kB
+         Buffers: shared hit=5941
+         ->  Append  (cost=70.58..16066.91 rows=4081 width=63) (actual time=0.583..15.402 rows=5897 loops=1)
+               Buffers: shared hit=5935
+               ->  Bitmap Heap Scan on trades  (cost=70.58..8022.62 rows=2041 width=63) (actual time=0.583..9.045 rows=2915 loops=1)
+                     Recheck Cond: (((buy_account_id = 13542) AND (executed_at < '2026-07-14 00:58:29.94077+00'::timestamp with time zone)) OR ((buy_account_id = 13542) AND (executed_at = '2026-07-14 00:58:29.94077+00'::timestamp with time zone) AND (id < 72200045)))
+                     Heap Blocks: exact=2911
+                     Buffers: shared hit=2937
+                     ->  BitmapOr  (cost=70.58..70.58 rows=2041 width=0) (actual time=0.345..0.346 rows=0 loops=1)
+                           Buffers: shared hit=26
+                           ->  Bitmap Index Scan on ix_trades_buy_account_executed_at_id  (cost=0.00..64.98 rows=2041 width=0) (actual time=0.340..0.341 rows=2915 loops=1)
+                                 Index Cond: ((buy_account_id = 13542) AND (executed_at < '2026-07-14 00:58:29.94077+00'::timestamp with time zone))
+                                 Buffers: shared hit=22
+                           ->  Bitmap Index Scan on ix_trades_buy_account_executed_at_id  (cost=0.00..4.58 rows=1 width=0) (actual time=0.004..0.004 rows=0 loops=1)
+                                 Index Cond: ((buy_account_id = 13542) AND (executed_at = '2026-07-14 00:58:29.94077+00'::timestamp with time zone) AND (id < 72200045))
+                                 Buffers: shared hit=4
+               ->  Bitmap Heap Scan on trades trades_1  (cost=70.57..8023.88 rows=2040 width=63) (actual time=0.518..6.031 rows=2982 loops=1)
+                     Recheck Cond: (((sell_account_id = 13542) AND (executed_at < '2026-07-14 00:58:29.94077+00'::timestamp with time zone)) OR ((sell_account_id = 13542) AND (executed_at = '2026-07-14 00:58:29.94077+00'::timestamp with time zone) AND (id < 72200045)))
+                     Filter: (buy_account_id <> 13542)
+                     Heap Blocks: exact=2976
+                     Buffers: shared hit=2998
+                     ->  BitmapOr  (cost=70.57..70.57 rows=2040 width=0) (actual time=0.278..0.279 rows=0 loops=1)
+                           Buffers: shared hit=22
+                           ->  Bitmap Index Scan on ix_trades_sell_account_executed_at_id  (cost=0.00..64.97 rows=2040 width=0) (actual time=0.273..0.273 rows=2982 loops=1)
+                                 Index Cond: ((sell_account_id = 13542) AND (executed_at < '2026-07-14 00:58:29.94077+00'::timestamp with time zone))
+                                 Buffers: shared hit=18
+                           ->  Bitmap Index Scan on ix_trades_sell_account_executed_at_id  (cost=0.00..4.58 rows=1 width=0) (actual time=0.004..0.004 rows=0 loops=1)
+                                 Index Cond: ((sell_account_id = 13542) AND (executed_at = '2026-07-14 00:58:29.94077+00'::timestamp with time zone) AND (id < 72200045))
+                                 Buffers: shared hit=4
+ Planning:
+   Buffers: shared hit=168
+ Planning Time: 0.636 ms
+ Execution Time: 16.111 ms
+(37 rows)
+

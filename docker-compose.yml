@@ -10,7 +10,7 @@ services:
               "-c", "pg_stat_statements.track=all", "-c", "max_connections=200",
               "-c", "log_lock_waits=on", "-c", "deadlock_timeout=1s"]
     ports: ["5433:5432"]
-    cpus: 2          # tune to your machine and record in the journal
+    cpus: 2         # diagnostic run: increace cpu
     mem_limit: 4g
     volumes:
       - pgdata:/var/lib/postgresql/data

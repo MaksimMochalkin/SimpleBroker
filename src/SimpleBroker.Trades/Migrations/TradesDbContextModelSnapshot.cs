@@ -63,6 +63,14 @@ namespace SimpleBroker.Trades.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("BuyAccountId", "ExecutedAt", "Id")
+                        .IsDescending(false, true, true)
+                        .HasDatabaseName("ix_trades_buy_account_executed_at_id");
+
+                    b.HasIndex("SellAccountId", "ExecutedAt", "Id")
+                        .IsDescending(false, true, true)
+                        .HasDatabaseName("ix_trades_sell_account_executed_at_id");
+
                     b.ToTable("trades", "trades");
                 });
 #pragma warning restore 612, 618

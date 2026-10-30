@@ -35,6 +35,8 @@ var app = builder.Build();
 app.MapAccountsEndpoints();
 app.MapOrdersEndpoints();
 app.MapTradesEndpoints();
+if (app.Configuration.GetValue<bool>("Trades:EnableDapperBenchmark"))
+    app.MapDapperTradesBenchmarkEndpoint();
 
 app.Run();
 

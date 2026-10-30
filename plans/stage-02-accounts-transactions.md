@@ -1,6 +1,6 @@
 # stage-02-accounts-transactions.md — Этап 2. Accounts and transactions: isolation, deadlocks, outbox
 
-> Обновлено: 2026-10-28 · Ветка: `stage/02-accounts-transactions` · Тег по завершении: `v0.2` (не ставить до закрытия критериев) · Статус: В работе — Release-сборка и 52 теста прошли; C1 и функциональные проверки пройдены; C2 retry при высокой конкуренции, C3/L1′ ещё требуют итоговой оценки · Сроки: нед 3–4 (2026-11-03 → 2026-11-16) · Родитель: [plan_highload_broker.md](plan_highload_broker.md)
+> Обновлено: 2026-10-30 · Ветка: `stage/02-accounts-transactions` · Тег по завершении: `v0.2` · Статус: Проверен по согласованию с пользователем; интеграционные и нагрузочные критерии, не подтверждённые в этой среде, остаются оговорёнными в [отчёте этапа 2](../docs/journal/stage-02-accounts-transactions-report-ru.md) · Сроки: нед 3–4 (2026-11-03 → 2026-11-16) · Родитель: [plan_highload_broker.md](plan_highload_broker.md)
 
 **Пошаговый запуск и проверки с ожидаемыми результатами: [docs/RUNBOOK-stage-02.md](../docs/RUNBOOK-stage-02.md).**
 

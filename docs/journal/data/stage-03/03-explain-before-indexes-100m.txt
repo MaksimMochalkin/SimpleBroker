@@ -1,0 +1,28 @@
+﻿                                                                 QUERY PLAN                                                                  
+---------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=1861012.03..1861017.87 rows=50 width=63) (actual time=8447.116..8579.522 rows=50 loops=1)
+   Buffers: shared hit=2308 read=1232409
+   ->  Gather Merge  (cost=1860726.18..1861295.09 rows=4876 width=63) (actual time=8344.455..8478.267 rows=2500 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=2308 read=1232409
+         ->  Sort  (cost=1859726.16..1859732.25 rows=2438 width=63) (actual time=8317.191..8317.591 rows=1200 loops=3)
+               Sort Key: executed_at DESC, id DESC
+               Sort Method: quicksort  Memory: 472kB
+               Buffers: shared hit=2308 read=1232409
+               Worker 0:  Sort Method: quicksort  Memory: 461kB
+               Worker 1:  Sort Method: quicksort  Memory: 465kB
+               ->  Parallel Seq Scan on trades  (cost=0.00..1859589.00 rows=2438 width=63) (actual time=116.647..8306.407 rows=2782 loops=3)
+                     Filter: ((buy_account_id = 13542) OR (sell_account_id = 13542))
+                     Rows Removed by Filter: 33330551
+                     Buffers: shared hit=2180 read=1232409
+ Planning:
+   Buffers: shared hit=97
+ Planning Time: 0.596 ms
+ JIT:
+   Functions: 8
+   Options: Inlining true, Optimization true, Expressions true, Deforming true
+   Timing: Generation 1.543 ms (Deform 0.359 ms), Inlining 339.451 ms, Optimization 80.386 ms, Emission 22.573 ms, Total 443.953 ms
+ Execution Time: 8644.415 ms
+(24 rows)
+

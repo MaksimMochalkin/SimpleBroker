@@ -8,7 +8,15 @@ using Npgsql;
 using NpgsqlTypes;
 
 var opt = Options.Parse(args);
-var scale = Scale.From(opt.Scale);
+var defaultScale = Scale.From(opt.Scale);
+var scale = defaultScale with
+{
+    Accounts = opt.Accounts ?? defaultScale.Accounts,
+    Instruments = opt.Instruments ?? defaultScale.Instruments,
+    Orders = opt.Orders ?? defaultScale.Orders,
+    Trades = opt.Trades ?? defaultScale.Trades,
+};
+scale.Validate();
 var rng = new Random(opt.Seed);
 var anchor = DateTime.SpecifyKind(DateTime.UtcNow.Date, DateTimeKind.Utc);
 
@@ -162,6 +170,12 @@ static double[] BuildZipfCdf(int n, double s)
 
 internal sealed record Scale(int Accounts, int Instruments, long Orders, long Trades)
 {
+    public void Validate()
+    {
+        if (Accounts < 1 || Instruments < 1 || Orders < 1 || Trades < 1)
+            throw new ArgumentException("accounts, instruments, orders and trades must all be positive");
+    }
+
     public static Scale From(string s) => s.ToUpperInvariant() switch
     {
         "S" => new Scale(10_000, 100, 500_000, 100_000),
@@ -171,12 +185,22 @@ internal sealed record Scale(int Accounts, int Instruments, long Orders, long Tr
     };
 }
 
-internal sealed record Options(string Scale, int Seed, string Connection, string Out)
+internal sealed record Options(
+    string Scale,
+    int Seed,
+    string Connection,
+    string Out,
+    int? Accounts,
+    int? Instruments,
+    long? Orders,
+    long? Trades)
 {
     public static Options Parse(string[] args)
     {
         string scale = "S", conn = "Host=localhost;Port=5433;Username=broker;Password=broker;Database=broker;Command Timeout=0", output = "loadtests/data";
         var seed = 42;
+        int? accounts = null, instruments = null;
+        long? orders = null, trades = null;
         for (var i = 0; i < args.Length - 1; i++)
         {
             switch (args[i])
@@ -185,8 +209,12 @@ internal sealed record Options(string Scale, int Seed, string Connection, string
                 case "--seed": seed = int.Parse(args[++i]); break;
                 case "--connection": conn = args[++i]; break;
                 case "--out": output = args[++i]; break;
+                case "--accounts": accounts = int.Parse(args[++i]); break;
+                case "--instruments": instruments = int.Parse(args[++i]); break;
+                case "--orders": orders = long.Parse(args[++i]); break;
+                case "--trades": trades = long.Parse(args[++i]); break;
             }
         }
-        return new Options(scale, seed, conn, output);
+        return new Options(scale, seed, conn, output, accounts, instruments, orders, trades);
     }
 }

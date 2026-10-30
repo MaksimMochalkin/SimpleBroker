@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Npgsql;
 
 namespace SimpleBroker.Trades.Internal;
 
@@ -12,15 +13,23 @@ public sealed class TradesDbContext(DbContextOptions<TradesDbContext> options) :
     public static void Configure(DbContextOptionsBuilder o, string connectionString) =>
         o.UseNpgsql(connectionString, n => n.MigrationsHistoryTable("__EFMigrationsHistory", Schema));
 
+    public static void Configure(DbContextOptionsBuilder o, NpgsqlDataSource dataSource) =>
+        o.UseNpgsql(dataSource, n => n.MigrationsHistoryTable("__EFMigrationsHistory", Schema));
+
     protected override void OnModelCreating(ModelBuilder mb)
     {
         mb.HasDefaultSchema(Schema);
 
-        // Only the primary key on purpose: indexes are the subject of stage 3.
         mb.Entity<Trade>(e =>
         {
             e.ToTable("trades");
             e.HasKey(x => x.Id);
+            e.HasIndex(x => new { x.BuyAccountId, x.ExecutedAt, x.Id })
+                .IsDescending(false, true, true)
+                .HasDatabaseName("ix_trades_buy_account_executed_at_id");
+            e.HasIndex(x => new { x.SellAccountId, x.ExecutedAt, x.Id })
+                .IsDescending(false, true, true)
+                .HasDatabaseName("ix_trades_sell_account_executed_at_id");
             e.Property(x => x.Id).HasColumnName("id").ValueGeneratedNever();
             e.Property(x => x.InstrumentId).HasColumnName("instrument_id");
             e.Property(x => x.BuyOrderId).HasColumnName("buy_order_id");
