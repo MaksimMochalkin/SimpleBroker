@@ -1,34 +1,26 @@
 ﻿                                                                              QUERY PLAN                                                                               
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
- Limit  (cost=11237.14..11237.27 rows=50 width=63) (actual time=283.894..283.903 rows=50 loops=1)
+ Limit  (cost=11237.14..11237.27 rows=50 width=63) (actual time=1029.809..1029.829 rows=50 loops=1)
    Buffers: shared hit=9 read=4290
-   ->  Sort  (cost=11231.02..11238.23 rows=2887 width=63) (actual time=283.583..283.842 rows=2500 loops=1)
+   ->  Sort  (cost=11231.02..11238.23 rows=2887 width=63) (actual time=1029.192..1029.672 rows=2500 loops=1)
          Sort Key: executed_at DESC, id DESC
          Sort Method: quicksort  Memory: 760kB
          Buffers: shared hit=9 read=4290
-         ->  Bitmap Heap Scan on trades  (cost=88.23..11065.08 rows=2887 width=63) (actual time=5.467..281.866 rows=4275 loops=1)
+         ->  Bitmap Heap Scan on trades  (cost=88.23..11065.08 rows=2887 width=63) (actual time=5.158..1023.436 rows=4275 loops=1)
                Recheck Cond: ((buy_account_id = 17856) OR (sell_account_id = 17856))
                Heap Blocks: exact=4261
                Buffers: shared hit=3 read=4290
-               ->  BitmapOr  (cost=88.23..88.23 rows=2887 width=0) (actual time=4.798..4.799 rows=0 loops=1)
+               ->  BitmapOr  (cost=88.23..88.23 rows=2887 width=0) (actual time=4.113..4.115 rows=0 loops=1)
                      Buffers: shared hit=3 read=29
-                     ->  Bitmap Index Scan on ix_trades_buy_account_executed_at_id  (cost=0.00..43.27 rows=1428 width=0) (actual time=2.800..2.800 rows=2109 loops=1)
+                     ->  Bitmap Index Scan on ix_trades_buy_account_executed_at_id  (cost=0.00..43.27 rows=1428 width=0) (actual time=1.920..1.921 rows=2109 loops=1)
                            Index Cond: (buy_account_id = 17856)
                            Buffers: shared hit=3 read=14
-                     ->  Bitmap Index Scan on ix_trades_sell_account_executed_at_id  (cost=0.00..43.51 rows=1459 width=0) (actual time=1.997..1.998 rows=2166 loops=1)
+                     ->  Bitmap Index Scan on ix_trades_sell_account_executed_at_id  (cost=0.00..43.51 rows=1459 width=0) (actual time=2.192..2.192 rows=2166 loops=1)
                            Index Cond: (sell_account_id = 17856)
                            Buffers: shared read=15
  Planning:
-   Buffers: shared hit=147 read=3
- Planning Time: 1.957 ms
- Execution Time: 284.011 ms
+   Buffers: shared hit=116 read=26
+ Planning Time: 5.985 ms
+ Execution Time: 1030.032 ms
 (22 rows)
 
-До индексов	                                                После индексов
-Parallel Seq Scan — просмотр почти всей таблицы	      Bitmap Index Scan по обоим новым индексам
-Прочитано около 614 922 буферов таблицы	                  Прочитано 4 290 буферов
-Execution Time ≈ 14,64 с	                        Execution Time ≈ 284 мс
-
-Важно заметить, что OFFSET здесь всё ещё работает: PostgreSQL извлёк и отсортировал 4 275 подходящих сделок,
-затем пропустил 2 450 и вернул 50. То есть индексы убрали полный просмотр таблицы,
-но не убрали работу по пропуску предыдущих результатов.
