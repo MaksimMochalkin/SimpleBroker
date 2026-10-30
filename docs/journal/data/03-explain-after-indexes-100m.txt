@@ -1,0 +1,26 @@
+﻿                                                                              QUERY PLAN                                                                               
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=22606.60..22606.73 rows=50 width=63) (actual time=1098.951..1098.960 rows=50 loops=1)
+   Buffers: shared hit=9 read=8370
+   ->  Sort  (cost=22600.48..22615.00 rows=5808 width=63) (actual time=1098.637..1098.892 rows=2500 loops=1)
+         Sort Key: executed_at DESC, id DESC
+         Sort Method: top-N heapsort  Memory: 757kB
+         Buffers: shared hit=9 read=8370
+         ->  Bitmap Heap Scan on trades  (cost=167.60..22243.64 rows=5808 width=63) (actual time=8.094..1091.252 rows=8347 loops=1)
+               Recheck Cond: ((buy_account_id = 13542) OR (sell_account_id = 13542))
+               Heap Blocks: exact=8321
+               Buffers: shared hit=3 read=8370
+               ->  BitmapOr  (cost=167.60..167.60 rows=5808 width=0) (actual time=6.974..6.975 rows=0 loops=1)
+                     Buffers: shared hit=3 read=49
+                     ->  Bitmap Index Scan on ix_trades_buy_account_executed_at_id  (cost=0.00..82.35 rows=2905 width=0) (actual time=3.450..3.451 rows=4144 loops=1)
+                           Index Cond: (buy_account_id = 13542)
+                           Buffers: shared hit=3 read=25
+                     ->  Bitmap Index Scan on ix_trades_sell_account_executed_at_id  (cost=0.00..82.34 rows=2903 width=0) (actual time=3.521..3.521 rows=4203 loops=1)
+                           Index Cond: (sell_account_id = 13542)
+                           Buffers: shared read=24
+ Planning:
+   Buffers: shared hit=142
+ Planning Time: 0.466 ms
+ Execution Time: 1099.121 ms
+(22 rows)
+
