@@ -58,4 +58,4 @@ Tests: `dotnet test` (integration tests need Docker; they start their own Postgr
 | Stage | Problem found by measurement | Change | Result |
 |---|---|---|---|
 | 1 | - (baseline) | skeleton + observability | see [journal](docs/journal/01-skeleton.md) |
-| 2 | Lost updates, overselling, deadlocks, and hot-account contention | atomic/locked/optimistic withdrawals, ordered transfers, reservations, transactional outbox | 10 architecture tests pass; integration fixture cannot start its Testcontainers Resource Reaper; `Ordered` avoids deadlocks, while C1 repetition, `UnorderedRetry`, and failing L1′ thresholds remain open — see [journal](docs/journal/02-accounts-transactions.md) |
+| 2 | Lost updates, overselling, deadlocks, and hot-account contention | atomic/locked/optimistic withdrawals, ordered transfers, reservations, transactional outbox | 10 architecture + 42 integration tests pass; C1 and C2 results plus an educational explanation are recorded; C3/L1′ measurements are still in progress, so `v0.2` is not yet tagged — see [journal](docs/journal/02-accounts-transactions.md) and [Russian learning report](docs/journal/stage-02-learning-report-ru.md) |

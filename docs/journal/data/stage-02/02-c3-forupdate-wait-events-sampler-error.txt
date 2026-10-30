@@ -1,0 +1,26 @@
+mode=forupdate account=5869 started=2026-10-28T22:53:05.4546083+05:00
+2026-10-28T22:53:05.4884485+05:00
+ERROR:  ORDER BY position 3 is not in select list LINE 1: ...RE datname='stage02_validation' GROUP BY 1,2 ORDER BY 3 DESC                                                                  ^
+2026-10-28T22:53:20.8834073+05:00
+ERROR:  ORDER BY position 3 is not in select list LINE 1: ...RE datname='stage02_validation' GROUP BY 1,2 ORDER BY 3 DESC                                                                  ^
+2026-10-28T22:53:36.3340219+05:00
+ERROR:  ORDER BY position 3 is not in select list LINE 1: ...RE datname='stage02_validation' GROUP BY 1,2 ORDER BY 3 DESC                                                                  ^
+2026-10-28T22:53:51.8972673+05:00
+ERROR:  ORDER BY position 3 is not in select list LINE 1: ...RE datname='stage02_validation' GROUP BY 1,2 ORDER BY 3 DESC                                                                  ^
+2026-10-28T22:54:07.4314241+05:00
+ERROR:  ORDER BY position 3 is not in select list LINE 1: ...RE datname='stage02_validation' GROUP BY 1,2 ORDER BY 3 DESC                                                                  ^
+2026-10-28T22:54:23.3091623+05:00
+ERROR:  ORDER BY position 3 is not in select list LINE 1: ...RE datname='stage02_validation' GROUP BY 1,2 ORDER BY 3 DESC                                                                  ^
+2026-10-28T22:54:38.9117625+05:00
+ERROR:  ORDER BY position 3 is not in select list LINE 1: ...RE datname='stage02_validation' GROUP BY 1,2 ORDER BY 3 DESC                                                                  ^
+2026-10-28T22:54:54.4239993+05:00
+ERROR:  ORDER BY position 3 is not in select list LINE 1: ...RE datname='stage02_validation' GROUP BY 1,2 ORDER BY 3 DESC                                                                  ^
+2026-10-28T22:55:10.2254253+05:00
+ERROR:  ORDER BY position 3 is not in select list LINE 1: ...RE datname='stage02_validation' GROUP BY 1,2 ORDER BY 3 DESC                                                                  ^
+2026-10-28T22:55:25.9350538+05:00
+ERROR:  ORDER BY position 3 is not in select list LINE 1: ...RE datname='stage02_validation' GROUP BY 1,2 ORDER BY 3 DESC                                                                  ^
+2026-10-28T22:55:41.5359850+05:00
+ERROR:  ORDER BY position 3 is not in select list LINE 1: ...RE datname='stage02_validation' GROUP BY 1,2 ORDER BY 3 DESC                                                                  ^
+2026-10-28T22:55:57.2185286+05:00
+ERROR:  ORDER BY position 3 is not in select list LINE 1: ...RE datname='stage02_validation' GROUP BY 1,2 ORDER BY 3 DESC                                                                  ^
+exit= completed=2026-10-28T22:56:12.7027566+05:00

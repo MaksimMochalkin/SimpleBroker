@@ -1,6 +1,6 @@
 # stage-02-accounts-transactions.md — Этап 2. Accounts and transactions: isolation, deadlocks, outbox
 
-> Обновлено: 2026-10-26 · Ветка: `stage/02-accounts-transactions` · Тег по завершении: `v0.2` (не ставить до закрытия критериев) · Статус: В работе — Release-сборка и архитектурные тесты пройдены; интеграционные и нагрузочные критерии не закрыты · Сроки: нед 3–4 (2026-11-03 → 2026-11-16) · Родитель: [plan_highload_broker.md](plan_highload_broker.md)
+> Обновлено: 2026-10-28 · Ветка: `stage/02-accounts-transactions` · Тег по завершении: `v0.2` (не ставить до закрытия критериев) · Статус: В работе — Release-сборка и 52 теста прошли; C1 и функциональные проверки пройдены; C2 retry при высокой конкуренции, C3/L1′ ещё требуют итоговой оценки · Сроки: нед 3–4 (2026-11-03 → 2026-11-16) · Родитель: [plan_highload_broker.md](plan_highload_broker.md)
 
 **Пошаговый запуск и проверки с ожидаемыми результатами: [docs/RUNBOOK-stage-02.md](../docs/RUNBOOK-stage-02.md).**
 
@@ -57,19 +57,19 @@
 
 Недели 3–4. Старт только после `v0.1`: `git checkout main && git checkout -b stage/02-accounts-transactions`. Код уже написан (раздел 4): задачи `[U]` = собрать, исправить, прогнать, замерить.
 
-- [ ] **S1** [U] Проект `SimpleBroker.Platform` (раздел 4), `Reservation`/`WithdrawMode`/`AccountsMetrics`, `WithdrawAsync` режимы `Naive` и `Atomic`, endpoint `/accounts/{id}/withdraw`, `Version` как токен. Тесты: 200/404/422.
-- [ ] **S2** [U] `tools/Contention` (6.1), кейс C1 на `Naive`. Записать 3 прогона: `lost`, `ok`, `final`.
-- [ ] **S3** [U] Режим `ForUpdate`; C1 на `Atomic` и `ForUpdate`; сравнить p95 и throughput.
-- [ ] **S4** [U] `TxRetry`, режимы `Optimistic`, `RepeatableRead`, `Serializable`; метрики retries/conflicts; C1 на всех режимах. Опционально: тест write skew на `Serializable` (два параллельных списания с разных счетов при условии «сумма ≥ 0»).
-- [ ] **S5** [U] Перевод `Unordered` без retry, C2: воспроизвести deadlock, снять `pg_stat_database.deadlocks` и лог Postgres (5.2).
-- [ ] **S6** [U] `UnorderedRetry` и `Ordered`; C2 на трёх режимах; инвариант суммы.
-- [ ] **S7** [U] Резервы: `IAccountsApi.ReserveAsync/ReleaseAsync`, таблица `reservations`, изменения `OrdersService`; обновить тесты этапа 1 (риск 5); тесты резерва.
-- [ ] **S8** [U] Outbox: `OutboxMessage`, `AddOutbox`, запись `TransferCompleted` и `OrderCreated` в той же транзакции.
-- [ ] **S9** [U] `OutboxPublisher`, `LoggingMessageSink`, метрики lag; тест «два публикатора, нет дублей».
-- [ ] **S10** [U] Миграции `Stage02` (5.1), применить на compose; архитектурный тест для `Platform`; `dotnet build` решения целиком.
-- [ ] **S11** [U] C3: `loadtests/hot-account.js` (6.2), панели Grafana (5.3), прогоны по режимам.
+- [x] **S1** [U] Проект `SimpleBroker.Platform` (раздел 4), `Reservation`/`WithdrawMode`/`AccountsMetrics`, `WithdrawAsync` режимы `Naive` и `Atomic`, endpoint `/accounts/{id}/withdraw`, `Version` как токен. Тесты: 200/404/422.
+- [x] **S2** [U] `tools/Contention` (6.1), кейс C1 на `Naive`. Записать 3 прогона: `lost`, `ok`, `final`.
+- [x] **S3** [U] Режим `ForUpdate`; C1 на `Atomic` и `ForUpdate`; сравнить p95 и throughput.
+- [x] **S4** [U] `TxRetry`, режимы `Optimistic`, `RepeatableRead`, `Serializable`; метрики retries/conflicts; C1 на всех режимах. Опционально: тест write skew на `Serializable` (два параллельных списания с разных счетов при условии «сумма ≥ 0»).
+- [x] **S5** [U] Перевод `Unordered` без retry, C2: воспроизвести deadlock, снять `pg_stat_database.deadlocks` и лог Postgres (5.2).
+- [x] **S6** [U] `UnorderedRetry` и `Ordered`; C2 на трёх режимах; инвариант суммы. При параллелизме 2 UnorderedRetry провёл 2 000/2 000 запросов; при параллелизме 16 остались 409 — смотреть отчёт и сырой лог.
+- [x] **S7** [U] Резервы: `IAccountsApi.ReserveAsync/ReleaseAsync`, таблица `reservations`, изменения `OrdersService`; обновить тесты этапа 1 (риск 5); тесты резерва.
+- [x] **S8** [U] Outbox: `OutboxMessage`, `AddOutbox`, запись `TransferCompleted` и `OrderCreated` в той же транзакции.
+- [x] **S9** [U] `OutboxPublisher`, `LoggingMessageSink`, метрики lag; тест «два публикатора, нет дублей».
+- [x] **S10** [U] Миграции `Stage02` (5.1), применить на compose; архитектурный тест для `Platform`; `dotnet build` решения целиком.
+- [ ] **S11** [U] C3: `loadtests/hot-account.js` (6.2), панели Grafana (5.3), прогоны по режимам. Панели добавлены; C3 k6 ещё выполняется.
 - [ ] **S12** [U] L1 на S после этапа: «цена корректности» относительно baseline (раздел 8). Перед каждым прогоном DataGen S (резервы «съедают» балансы).
-- [ ] **S13** [U] `docs/journal/02-accounts-transactions.md`, ADR-0003 (стратегии конкурентного доступа), ADR-0004 (резерв без распределённой транзакции + outbox), строка в README. [A] ревью EN.
+- [x] **S13** [U] `docs/journal/02-accounts-transactions.md`, ADR-0003 (стратегии конкурентного доступа), ADR-0004 (резерв без распределённой транзакции + outbox), строка в README. [A] ревью EN.
 - [ ] **S14** Буфер, чистка, `docker compose down -v && up`, тег `v0.2`, статусы в планах.
 
 **Как проверить:**

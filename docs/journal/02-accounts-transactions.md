@@ -1,8 +1,10 @@
 # Stage 2: accounts, transactions, deadlocks, and outbox
 
-**Status:** in progress; Release build and architecture tests pass, integration tests are blocked by Testcontainers/Docker startup, and load-test exit criteria are not met.  
+**Status:** in progress; latest Release build, 52 tests, live smoke checks and C1 passed. Ordered transfers and bounded-concurrency UnorderedRetry passed; UnorderedRetry still returns 409 under higher contention and one high-load Unordered sample had a 500. C3/L1′ are being measured; stage acceptance is not yet closed. See the [Russian learning report](stage-02-learning-report-ru.md) for current results.  
 **Branch:** `stage/02-accounts-transactions` | **Target tag:** `v0.2` (not created)  
-**Test date:** 2026-10-26 | **Machine:** B only
+**Current verification:** 2026-10-28 | **Machine:** Intel Core i5-1135G7, 4 cores / 8 logical processors; PostgreSQL 17 in Docker; .NET 10.0.402; k6 2.2.0
+
+> The sections below are the historical snapshot recorded on 2026-10-26. Their earlier Testcontainers failure and single-run C1/C2 observations were superseded by the 2026-10-28 verification and the linked learning report. Retained raw run files are in [`data/stage-02/`](data/stage-02/).
 
 ## Environment and evidence
 

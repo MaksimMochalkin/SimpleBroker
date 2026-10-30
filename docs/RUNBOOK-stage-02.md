@@ -54,7 +54,7 @@ dotnet build SimpleBroker.slnx -v q --nologo
 dotnet test SimpleBroker.slnx --nologo -v q --filter "Category!=Demo"
 ```
 
-Ожидаем: `Passed! ... Passed: 10` (ArchitectureTests: 9 из этапа 1 и новый `Platform_does_not_reference_modules`) и `Passed! ... Passed: 40` (IntegrationTests: 18 из этапа 1 и 22 новых). Цифры 10 и 40 посчитаны вручную: если все тесты зелёные, а число отличается на 1–2, это не проблема. `Failed` > 0 является проблемой: пришлите имя теста и сообщение.
+Ожидаем: `Passed! ... Passed: 10` (ArchitectureTests) и `Passed! ... Passed: 42` (IntegrationTests на текущем коде). Количество тестов может вырасти при добавлении сценариев; важны `Failed: 0` и успешное завершение обеих сборок. `Failed` > 0 является проблемой: сохраните имя теста и сообщение.
 
 Что именно проверяют новые тесты:
 
@@ -118,11 +118,19 @@ docker compose exec postgres psql -U broker -d broker -c "\d accounts.reservatio
 
 **D1. Что проверяем:** данные S загружаются (DataGen теперь очищает и новые таблицы, поэтому миграция из части C обязательна).
 
+**Важно:** DataGen выполняет `TRUNCATE` таблиц и удалит прежние данные в выбранной базе. Если в `broker` уже есть нужные данные, создайте отдельную базу для проверки и явно передайте её через `--connection`; не запускайте команду по умолчанию против ценной базы.
+
 ```powershell
 dotnet run -c Release --project tools/DataGen -- --scale S --seed 42 --out loadtests/data
 ```
 
-Ожидаем: как в этапе 1 (фазы и `done in ...s`, около 2 с). Ошибка `relation "accounts.reservations" does not exist` значит, не применён шаг C3.
+Пример для отдельной БД `stage02_validation`:
+
+```powershell
+dotnet run -c Release --project tools/DataGen -- --scale S --seed 42 --out loadtests/data --connection "Host=localhost;Port=5433;Username=broker;Password=broker;Database=stage02_validation"
+```
+
+Ожидаем: как в этапе 1 (фазы и `done in ...s`, обычно несколько секунд). Ошибка `relation "accounts.reservations" does not exist` значит, не применён шаг C3.
 
 **D2. Что проверяем:** API стартует с включённым переопределением режима. Флаг `Accounts__AllowModeOverride` разрешает параметр `?mode=` (без него режим берётся из конфигурации: `Atomic`/`Ordered`; в «проде» переключатель выключен).
 

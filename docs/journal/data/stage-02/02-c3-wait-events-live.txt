@@ -1,0 +1,75 @@
+mode=atomic pid=37420 started=2026-10-28T22:51:52.4972814+05:00
+2026-10-28T22:51:52.5410324+05:00
+LWLock|LockManager|65 Lock|transactionid|29 CPU|-|5 Lock|tuple|2
+2026-10-28T22:52:09.0196392+05:00
+LWLock|LockManager|89 Lock|tuple|4 CPU|-|3 Lock|transactionid|3 Client|ClientRead|1 IO|WalSync|1
+2026-10-28T22:52:24.8913171+05:00
+Lock|transactionid|90 Client|ClientRead|4 Timeout|SpinDelay|3 Lock|tuple|2 CPU|-|1 IO|WalSync|1
+2026-10-28T22:52:40.6347605+05:00
+LWLock|LockManager|61 Lock|transactionid|25 Client|ClientRead|7 Lock|tuple|4 CPU|-|3 IO|WalWrite|1
+mode=atomic completed=2026-10-28T22:52:56.3375682+05:00
+mode=forupdate pid=70088 started=2026-10-28T22:53:06.4485637+05:00
+2026-10-28T22:53:06.4559027+05:00
+Client|ClientRead|100 CPU|-|1
+2026-10-28T22:53:21.8520262+05:00
+Client|ClientRead|96 Lock|transactionid|2 CPU|-|1 IO|WalSync|1 Lock|tuple|1
+2026-10-28T22:53:37.3595925+05:00
+Client|ClientRead|91 Lock|tuple|7 Lock|transactionid|2 CPU|-|1
+2026-10-28T22:53:52.7838323+05:00
+Client|ClientRead|81 Lock|tuple|15 CPU|-|4 Lock|transactionid|1
+2026-10-28T22:54:08.3548722+05:00
+Client|ClientRead|69 Lock|tuple|28 CPU|-|2 Lock|transactionid|2
+2026-10-28T22:54:23.9819413+05:00
+Client|ClientRead|59 Lock|tuple|39 Lock|transactionid|2 CPU|-|1
+2026-10-28T22:54:39.6005356+05:00
+Lock|tuple|46 Client|ClientRead|39 LWLock|LockManager|9 Lock|transactionid|5 CPU|-|2
+2026-10-28T22:54:55.2461195+05:00
+Lock|tuple|97 CPU|-|3 Lock|transactionid|1
+2026-10-28T22:55:10.9305096+05:00
+Lock|tuple|71 Lock|transactionid|25 CPU|-|2 LWLock|LockManager|2 Client|ClientRead|1
+2026-10-28T22:55:26.9790110+05:00
+Lock|tuple|97 CPU|-|2 Client|ClientRead|1 Lock|transactionid|1
+2026-10-28T22:55:42.5477415+05:00
+Lock|tuple|98 CPU|-|2 Lock|transactionid|1
+2026-10-28T22:55:58.3530169+05:00
+Client|ClientRead|53 Lock|tuple|44 CPU|-|3 Lock|transactionid|1
+mode=forupdate completed=2026-10-28T22:56:13.9217503+05:00
+mode=optimistic pid=64352 started=2026-10-28T22:56:13.9291022+05:00
+2026-10-28T22:56:13.9409517+05:00
+Client|ClientRead|99 CPU|-|1 IO|WalSync|1
+2026-10-28T22:56:29.2659170+05:00
+Client|ClientRead|96 Lock|tuple|2 CPU|-|1 IO|WalSync|1 Lock|transactionid|1
+2026-10-28T22:56:45.0596249+05:00
+Client|ClientRead|90 Lock|tuple|8 CPU|-|1 IO|WalSync|1 Lock|transactionid|1
+2026-10-28T22:57:01.4395384+05:00
+Client|ClientRead|80 Lock|tuple|17 CPU|-|4
+2026-10-28T22:57:17.1344710+05:00
+Client|ClientRead|70 Lock|tuple|29 CPU|-|2
+2026-10-28T22:57:33.4559751+05:00
+Client|ClientRead|58 Lock|tuple|42 CPU|-|1
+2026-10-28T22:57:49.4046949+05:00
+Lock|tuple|60 Client|ClientRead|35 CPU|-|4 IO|WalSync|1 Lock|transactionid|1
+2026-10-28T22:58:05.4091479+05:00
+Lock|tuple|98 Client|ClientRead|1 CPU|-|1 IO|WalSync|1
+2026-10-28T22:58:21.4815759+05:00
+Lock|tuple|90 Client|ClientRead|6 CPU|-|3 IO|WalSync|1 Lock|transactionid|1
+2026-10-28T22:58:37.8852054+05:00
+Lock|tuple|97 CPU|-|2 IO|WalSync|1 Lock|transactionid|1
+2026-10-28T22:58:53.8695596+05:00
+Lock|tuple|81 LWLock|MultiXactOffsetSLRU|7 Client|ClientRead|6 CPU|-|5 IO|WalSync|1 Lock|transactionid|1
+2026-10-28T22:59:10.3320283+05:00
+Client|ClientRead|98 CPU|-|1 IO|WalSync|1 Lock|tuple|1
+mode=optimistic completed=2026-10-28T22:59:27.1637139+05:00
+mode=serializable pid=27492 started=2026-10-28T22:59:27.1812039+05:00
+2026-10-28T22:59:27.2044902+05:00
+Client|ClientRead|100 CPU|-|1
+2026-10-28T22:59:42.7398018+05:00
+Client|ClientRead|100 CPU|-|1
+2026-10-28T22:59:58.9878640+05:00
+Client|ClientRead|56 CPU|-|2
+2026-10-28T23:00:14.5682520+05:00
+Client|ClientRead|57 CPU|-|1
+2026-10-28T23:00:30.5212790+05:00
+Client|ClientRead|54 CPU|-|1 IO|WalSync|1 Lock|transactionid|1 Lock|tuple|1
+2026-10-28T23:00:46.4435394+05:00
+Client|ClientRead|57 CPU|-|1
