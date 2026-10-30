@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Npgsql;
 
 namespace SimpleBroker.Trades.Internal;
 
@@ -11,6 +12,9 @@ public sealed class TradesDbContext(DbContextOptions<TradesDbContext> options) :
 
     public static void Configure(DbContextOptionsBuilder o, string connectionString) =>
         o.UseNpgsql(connectionString, n => n.MigrationsHistoryTable("__EFMigrationsHistory", Schema));
+
+    public static void Configure(DbContextOptionsBuilder o, NpgsqlDataSource dataSource) =>
+        o.UseNpgsql(dataSource, n => n.MigrationsHistoryTable("__EFMigrationsHistory", Schema));
 
     protected override void OnModelCreating(ModelBuilder mb)
     {

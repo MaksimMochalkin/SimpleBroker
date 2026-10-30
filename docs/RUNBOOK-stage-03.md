@@ -273,9 +273,18 @@ docker compose exec postgres psql -U broker -d broker -c "SHOW max_connections"
 
 ## H. EF Core и Dapper: сравнение без преждевременной замены
 
-На этом этапе активный endpoint реализован EF Core с проекцией `AsNoTracking`, `UNION ALL`-эквивалентом и keyset-фильтром. Dapper пока не выбран как production-путь: сначала сравните обе реализации при одинаковом SQL, данных, индексе и профиле k6. Не сравнивайте разные планы или разные аккаунты.
+Основной endpoint остаётся на EF Core. Для эксперимента добавлен отдельный маршрут `/accounts/{id}/trades/dapper`; он выключен по умолчанию и включается только переменной `Trades__EnableDapperBenchmark=true`. Оба варианта используют один `NpgsqlDataSource`/пул соединений и должны возвращать одинаковые результаты для одинаковых account, size и cursor.
 
-Для сравнения сохраните для каждой реализации: команду/SQL, RPS, p50/p95/p99, CPU процесса, `pg_stat_statements` calls/mean time, `idx_scan` и долю ошибок. Если Dapper-вариант не даёт устойчивого измеримого выигрыша, оставьте EF Core. При доказанном выигрыше добавляйте отдельный контролируемый вариант и тесты контракта, затем повторите все проверки E–G.
+Запустите Host с benchmark-маршрутом, затем сравнивайте реализации последовательно, не параллельно:
+
+```powershell
+$env:Trades__EnableDapperBenchmark = "true"
+dotnet run -c Release --project src\SimpleBroker.Host
+```
+
+Для EF Core задайте `$env:ENGINE = "ef"`, для Dapper — `$env:ENGINE = "dapper"`. Для каждого прогона оставляйте одинаковыми `ACCOUNT_ID`, `RATE`, `CURSOR`, `size` (скрипт использует 50) и профиль длительности; сохраните JSON/text-выводы раздельно. Не забудьте задать `$env:RATE = "200"` явно: переменная может сохраниться в том же окне PowerShell после предыдущего pool-теста. Маршрут Dapper предназначен только для контролируемого benchmark и не заменяет production endpoint.
+
+Для сравнения сохраните для каждой реализации: RPS, p50/p95/p99, `dropped_iterations`, долю ошибок, CPU процесса, `pg_stat_statements` calls/mean time и `idx_scan`. Если Dapper не даёт устойчивого измеримого выигрыша на одинаковых данных и условиях, оставьте EF Core. Интеграционный тест проверяет совпадение первой и cursor-страниц у обоих маршрутов.
 
 ---
 

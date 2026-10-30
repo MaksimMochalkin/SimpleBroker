@@ -33,6 +33,7 @@ public sealed class BrokerFixture : IAsyncLifetime
         Environment.SetEnvironmentVariable("ConnectionStrings__Broker", _pg.GetConnectionString());
         Environment.SetEnvironmentVariable("OTEL_SDK_DISABLED", "true");
         Environment.SetEnvironmentVariable("Accounts__AllowModeOverride", "true"); // ?mode= for stage-2 concurrency tests
+        Environment.SetEnvironmentVariable("Trades__EnableDapperBenchmark", "true");
 
         Factory = new WebApplicationFactory<Program>().WithWebHostBuilder(b => b.ConfigureLogging(l => l.AddProvider(Logs)));
         Client = Factory.CreateClient();

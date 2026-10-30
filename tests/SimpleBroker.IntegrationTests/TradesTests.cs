@@ -87,6 +87,31 @@ public class TradesTests(BrokerFixture fx)
         Assert.Null(nextPage.NextCursor);
     }
 
+    [Fact]
+    public async Task Dapper_benchmark_endpoint_matches_EF_for_first_and_cursor_pages()
+    {
+        await Seed();
+
+        var efFirst = await fx.Client.GetFromJsonAsync<TradesPage>($"/accounts/{Account}/trades?size=10");
+        var dapperFirst = await fx.Client.GetFromJsonAsync<TradesPage>($"/accounts/{Account}/trades/dapper?size=10");
+
+        Assert.NotNull(efFirst);
+        Assert.NotNull(dapperFirst);
+        Assert.Equal(efFirst.Items, dapperFirst.Items);
+        Assert.Equal(efFirst.NextCursor, dapperFirst.NextCursor);
+
+        var cursor = Uri.EscapeDataString(efFirst.NextCursor!);
+        var efSecond = await fx.Client.GetFromJsonAsync<TradesPage>(
+            $"/accounts/{Account}/trades?size=10&cursor={cursor}");
+        var dapperSecond = await fx.Client.GetFromJsonAsync<TradesPage>(
+            $"/accounts/{Account}/trades/dapper?size=10&cursor={cursor}");
+
+        Assert.NotNull(efSecond);
+        Assert.NotNull(dapperSecond);
+        Assert.Equal(efSecond.Items, dapperSecond.Items);
+        Assert.Equal(efSecond.NextCursor, dapperSecond.NextCursor);
+    }
+
     [Theory]
     [InlineData("page=0&size=10")]
     [InlineData("page=2&size=10")]

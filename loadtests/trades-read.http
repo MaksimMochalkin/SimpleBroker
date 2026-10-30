@@ -1,0 +1,8 @@
+@baseUrl = http://localhost:5000
+@accountId = 17856
+
+### EF Core hot-read endpoint
+GET {{baseUrl}}/accounts/{{accountId}}/trades?size=50
+
+### Dapper benchmark endpoint (requires Trades__EnableDapperBenchmark=true)
+GET {{baseUrl}}/accounts/{{accountId}}/trades/dapper?size=50
